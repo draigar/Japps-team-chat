@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      #chatArea{
+        width: 80%; 
+        position:fixed;
+        border:1px solid red;
+        float: left;
+        height: 100%;
+        display: none;
+      }
+      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 80%;}
+      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+      form{
+        #display:none;
+      }
+      #online{
+        width: 20%;
+        float: right;
+        border:1px;
+        height: 100%;
+        display:none;
+      }
+      #logfrm{
+        clear:both;
+        top:0;
+        bottom: 89%;
+        width: 40%;
+        left: 27%;
+      }
+      #buttlog{
+        width: 8%;
+        padding-left: 6px;
+        border: none; 
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class ="login">
+      <form id ="logfrm">
+        <input type ="text" id="usercont"/> <input type ="button" id ="buttlog" value ="Login"></input>
+      </form>
+      <p id="error"> </p>
+    </div>
+
+
+    <div id ="chatArea">
+      <ul id="messages"></ul>
+      <form>
+        <input id="m" autocomplete="off" /><button id = "btn">Send</button>
+      </form>
+    
+    </div>
+    <div id="online">
+
+    </div>
+    <input id ="hider" type ="hidden" />
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+  <script>
+  var socket = io();
+  $('#buttlog').click(function(){
+    socket.emit('new-user', $('#usercont').val(), function(data){
+    if(data){
+      $('.login').hide();
+      $('#chatArea').show();
+      $('#online').show();
+    }else{
+      $('#error').html('The Username is already taken, please try another')
+    }
+  });
+    $('#usercont').val('');
+    return false;
+  });
+
+  socket.on('usernames', function(data){
+    var html ='';
+    for(i=0; i< data.length; i++){
+      
+      html += "<a><span onclick ='choose(\""+data[i]+"\");' style='font-weight: bold; cursor:pointer;'>" + data[i] + "</span></a><br/>"
+    }
+    $('#online').html(html);
+  });
+
+  $('#btn').click(function(e){
+    e.preventDefault();
+    var carrier = $('#hider').val();
+  
+  
+    if (carrier){
+      var msg = $('#m').val();
+      var send = carrier +' '+ msg;
+      socket.emit('private_message', send);
+      $('#m').val('');
+    }else{
+      console.log('Normal msg');
+    socket.emit('chat message', $('#m').val());
+    $('#m').val('');
+   }
+  });
+  socket.on('chat message', function(data){
+    $('#messages').append($('<li>').text(data.nick +': '+ data.msg));
+  });
+  function choose(targetUser){
+   
+    $('#hider').val(targetUser);
+     alert($('#hider').val());
+  }
+</script>  
+  </body>
+</html>
