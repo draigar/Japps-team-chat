@@ -45,6 +45,8 @@ io.on('connection', function(socket){
   
 });
 
-http.listen(3000, function(){
-  console.log('listening on *:3000');
+app.set('port',(process.env.PORT || 5000));
+
+app.listen(app.get('port'),function(){
+    console.log("Listening on http://127.0.0.1:3000");
 });
