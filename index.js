@@ -44,7 +44,7 @@ io.on('connection', function(socket){
   });
   
 });
-app.set('port',(process.env.PORT || 5000));
 
-app.listen(app.get('port'),function(){
+http.listen(process.env.PORT || 3000,function(){
+    console.log("Listening on 3000");
 });
