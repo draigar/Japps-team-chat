@@ -1,13 +1,14 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var fs = require('fs');
 var users = {};
 app.get('/', function(req, res){
    res.sendFile(__dirname + '/index.html');
 });
 
 io.on('connection', function(socket){
-  //console.log('a user with socket: '+ socket.id +' connected');
+  console.log('a user with socket: '+ socket.id +' connected');
 
   socket.on('new-user', function(data, callback){
   	if (data in users){
@@ -24,6 +25,11 @@ io.on('connection', function(socket){
   	io.emit('usernames', Object.keys(users));
   }
  socket.on('chat message', function(data){
+	 var newContent = '<div class="chat">'+msg: data, nick: socket.usernames+'</div> ';
+	 fs.appendFile('myOutput2.txt', newContent, encoding='utf8', function (err) {
+		if (err) throw err;
+		console.log('message: ' + msg: data, nick: socket.usernames);
+	});
     io.emit('chat message', {msg: data, nick: socket.usernames});
   });
 
@@ -37,7 +43,7 @@ io.on('connection', function(socket){
  });
 
   socket.on('disconnect', function(){
-  //console.log('a user with socket: '+ socket.id +' disconnected');
+  console.log('a user with socket: '+ socket.id +' disconnected');
   if(!socket.usernames) return;
    delete users[socket.usernames];
  update();
@@ -45,8 +51,6 @@ io.on('connection', function(socket){
   
 });
 
-app.set('port',(process.env.PORT || 5000));
-
-app.listen(app.get('port'),function(){
-    console.log("Listening on http://127.0.0.1:3000");
+http.listen(process.env.PORT || 3000,function(){
+    console.log("Listening on 3000");
 });
